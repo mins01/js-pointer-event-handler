@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko" >
+<head>
+    <title>js-pointer-event-handler</title>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" href="http://www.mins01.com/favicon.ico"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="/js/ForGoogle.js"></script>
+    <!-- google analytics -->
+    <script>if(window.ForGoogle){ ForGoogle.analytics() }else{ console.log("failure : ForGoogle.analytics()");}</script>
+    
+
+    <!-- jquery 관련 -->
+    <!-- <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script> -->
+
+    <!-- 부트스트랩 5.3.x -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script> -->
+
+    <!-- vue.js -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+    
+    <!-- meta og -->
+    
+    <meta property="og:title" content="js-pointer-event-handler">
+    <meta property="og:description" content="js-pointer-event-handler">
+    <meta name="og:image" content="http://www.mins01.com/img/logo.gif">
+    <meta property="og:image:width" content="190">
+    <meta property="og:image:height" content="70" />
+    <meta property="og:site_name" content="js-pointer-event-handler" />
+    <meta property="og:type" content="website">
+    
+    <!-- //meta og -->
+    
+    <script src="PointerEventHandler.js"></script>
+    <script>
+        window.addEventListener('load',(event)=>{
+            const peh1 = globalThis.peh1 = new PointerEventHandler(document.getElementById('box-1'));
+            const output = document.getElementById('output')
+            peh1.onpointerdown=(event)=>{
+                event.stopPropagation();
+                event.preventDefault();
+                const json = {
+                    'event.type':event.type,
+                    'pointers.size':peh1.pointers.size,
+                    'maxPointers':peh1.maxPointers,
+                    'downAt':peh1.downAt,
+                    'target.id':peh1.target.id,
+                    'event.currentTarget':event.currentTarget.constructor.name+"#"+event.currentTarget.id,
+                    'xys':[...peh1.pointers.values()].map(r=> [r.pointerType+":"+r.x.toFixed(2)+","+r.y.toFixed(2)]),
+                }
+                output.textContent = JSON.stringify(json,null,2)
+                console.log(peh1.pointers);
+                
+            }
+            peh1.onpointermove=(event)=>{
+                event.stopPropagation();
+                event.preventDefault();
+                const json = {
+                    'event.type':event.type,
+                    'pointers.size':peh1.pointers.size,
+                    'maxPointers':peh1.maxPointers,
+                    'downAt':peh1.downAt,
+                    'target.id':peh1.target.id,
+                    'event.currentTarget':event.currentTarget.constructor.name+"#"+event.currentTarget.id,
+                    'xys':[...peh1.pointers.values()].map(r=> [r.pointerType+":"+r.x.toFixed(2)+","+r.y.toFixed(2)]),
+                }
+                output.textContent = JSON.stringify(json,null,2)
+                console.log(...peh1.pointers.values());
+            }
+            peh1.onpointerup=(event)=>{
+                event.stopPropagation();
+                event.preventDefault();
+                const json = {
+                    'event.type':event.type,
+                    'pointers.size':peh1.pointers.size,
+                    'maxPointers':peh1.maxPointers,
+                    'downAt':peh1.downAt,
+                    'target.id':peh1.target.id,
+                    'event.currentTarget':event.currentTarget.constructor.name+"#"+event.currentTarget.id,
+                    'xys':[...peh1.pointers.values()].map(r=> [r.pointerType+":"+r.x.toFixed(2)+","+r.y.toFixed(2)]),
+                }
+                output.textContent = JSON.stringify(json,null,2)
+                console.log(peh1.pointers);
+            }
+        })
+    </script>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>js-pointer-event-handler</h1>
+        <output id="output" style="width: 100%; height: 100vh; height:100dvh; white-space:pre-line;white-space: break-spaces;" class="user-select-none fixed-top pe-none d-flex justify-content-center align-items-center p-3 text-start"></output>
+        <div>
+            <div class="p-5">
+                <div id="box-1" class="border border-1 rounded text-bg-primary d-flex justify-content-center align-items-center p-1 text-center" style="width:100px;height:100px;touch-action: none;">pointer<br>start</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
