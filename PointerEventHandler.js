@@ -17,45 +17,25 @@ class PointerEventHandler{
     }
     addEventListener(target){
         this.target = target
+        const options = { passive: false };
         target.addEventListener('pointerdown',this.pointerdown);
-        target.addEventListener('pointermove',this.pointermove,{passive: false})
-        target.addEventListener('pointerup',this.pointerup)
-        target.addEventListener('pointerleave',this.pointerleave); // 거의 발생하지 않을꺼다
-        target.addEventListener('pointercancel',this.pointercancel) // 시스템 메세지 등이 뜨면 발생.
+        target.addEventListener('pointermove',this.pointermove,options)
+        target.addEventListener('pointerup',this._pointerend)
+        target.addEventListener('pointerleave',this._pointerend); // 거의 발생하지 않을꺼다
+        target.addEventListener('pointercancel',this._pointerend) // 시스템 메세지 등이 뜨면 발생.
     }
     removeEventListener(){
-        if(this.target) {
-            this.target.removeEventListener('pointerdown',this.pointerdown);
-            this.target.removeEventListener('pointermove',this.pointermove,{ passive: false })
-            this.target.removeEventListener('pointerup',this.pointerup)
-            this.target.removeEventListener('pointerleave',this.pointerleave)
-            this.target.removeEventListener('pointercancel',this.pointercancel)
-        }
+        if(!this.target) {return; }
+        const options = { passive: false };
+        this.target.removeEventListener('pointerdown',this.pointerdown);
+        this.target.removeEventListener('pointermove',this.pointermove,options)
+        this.target.removeEventListener('pointerup',this._pointerend)
+        this.target.removeEventListener('pointerleave',this._pointerend)
+        this.target.removeEventListener('pointercancel',this._pointerend)
     }
     
-    extractPointerData(event){
-        return { 
-            x:event.clientX,
-            y:event.clientY,
-            pointerId:event.pointerId,
-            pointerType:event.pointerType,
-            isPrimary:event.isPrimary,
-            clientX:event.clientX,
-            clientY:event.clientY,
-            pageX:event.pageX,
-            pageY:event.pageY,
-            screenX:event.screenX,
-            screenY:event.screenY,
-            pressure:event.pressure,
-            tiltX:event.tiltX,
-            tiltY:event.tiltY,
-            buttons:event.buttons,
-            width:event.width,
-            height:event.height,
-            twist:event.twist,
-            timeStamp:event.timeStamp,
-            tangentialPressure:event.tangentialPressure,
-        }
+     extractPointerData({ pointerId, pointerType, isPrimary, clientX, clientY, pageX, pageY, screenX, screenY, pressure, tiltX, tiltY, buttons, width, height, twist, timeStamp, tangentialPressure,x,y }) {
+        return { pointerId, pointerType, isPrimary, clientX, clientY, pageX, pageY, screenX, screenY, pressure, tiltX, tiltY, buttons, width, height, twist, timeStamp, tangentialPressure,x,y };
     }
     pointerdown = (event)=>{
         if(this.pointers.size===0){ this.downAt = Date.now(); this.maxActivePointers=0; }
@@ -65,38 +45,23 @@ class PointerEventHandler{
             this.maxActivePointers = Math.max(this.maxActivePointers,this.pointers.size)       
         }
         
-        if(this.onpointerdown){this.onpointerdown(event)}
+        this.onpointerdown?.(event)
     }
     pointermove = (event)=>{
-        if(this.downAt){
-            if(this.pointers.has(event.pointerId)) this.pointers.set(event.pointerId, this.extractPointerData(event));
-            if(this.onpointermove){this.onpointermove(event)}
-        }
+        if (!this.downAt || !this.pointers.has(event.pointerId)) return;
+        this.pointers.set(event.pointerId, this.extractPointerData(event));
+        this.onpointermove?.(event);
     }
-    pointerup = (event)=>{
-        if(this.downAt){
-            this.pointers.delete(event.pointerId);
-            if(this.onpointerup){this.onpointerup(event)}
-            if(this.pointers.size===0){this.downAt = null; this.maxActivePointers=0;}
-        }
-        this.target.releasePointerCapture(event.pointerId);
-    }
-    pointerleave = (event)=>{
-        if(this.downAt){
-            this.pointers.delete(event.pointerId);
-            if(this.onpointerleave){this.onpointerleave(event)}
-            if(this.pointers.size===0){this.downAt = null; this.maxActivePointers=0;}
+    _pointerend = (event)=>{
+        if (this.pointers.delete(event.pointerId)) {
+            if (event.type === 'pointerup') this.onpointerup?.(event);
+            else if (event.type === 'pointerleave') this.onpointerleave?.(event);
+            else if (event.type === 'pointercancel') this.onpointercancel?.(event);
         }
         this.target.releasePointerCapture(event.pointerId);
+        if(this.pointers.size===0){this.downAt = null; this.maxActivePointers=0;}
     }
-    pointercancel = (event)=>{
-        if(this.downAt){
-            this.pointers.delete(event.pointerId);
-            if(this.onpointercancel){this.onpointercancel(event)}
-            if(this.pointers.size===0){this.downAt = null; this.maxActivePointers=0;}
-        }
-        this.target.releasePointerCapture(event.pointerId);
-    }
+    
 
     onpointerdown(event){
         console.log('onpointerdown');

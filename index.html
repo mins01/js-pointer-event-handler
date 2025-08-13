@@ -52,11 +52,10 @@
                     'downAt':peh1.downAt,
                     'target.id':peh1.target.id,
                     'event.currentTarget':event.currentTarget.constructor.name+"#"+event.currentTarget.id,
-                    'xys':[...peh1.pointers.values()].map(r=> [r.pointerType+":"+r.x.toFixed(2)+","+r.y.toFixed(2)]),
+                    'xys':[...peh1.pointers.values()].map(r=> [r.pointerType+":"+r.clientX.toFixed(2)+","+r.clientY.toFixed(2)]),
                 }
                 output.textContent = JSON.stringify(json,null,2)
-                console.log(peh1.pointers);
-                
+                console.log('peh1.pointers.size',peh1.pointers.size);                
             }
             peh1.onpointermove=(event)=>{
                 event.stopPropagation();
@@ -68,7 +67,7 @@
                     'downAt':peh1.downAt,
                     'target.id':peh1.target.id,
                     'event.currentTarget':event.currentTarget.constructor.name+"#"+event.currentTarget.id,
-                    'xys':[...peh1.pointers.values()].map(r=> [r.pointerType+":"+r.x.toFixed(2)+","+r.y.toFixed(2)]),
+                    'xys':[...peh1.pointers.values()].map(r=> [r.pointerType+":"+r.clientX.toFixed(2)+","+r.clientY.toFixed(2)]),
                 }
                 output.textContent = JSON.stringify(json,null,2)
                 console.log(...peh1.pointers.values());
@@ -83,10 +82,10 @@
                     'downAt':peh1.downAt,
                     'target.id':peh1.target.id,
                     'event.currentTarget':event.currentTarget.constructor.name+"#"+event.currentTarget.id,
-                    'xys':[...peh1.pointers.values()].map(r=> [r.pointerType+":"+r.x.toFixed(2)+","+r.y.toFixed(2)]),
+                    'xys':[...peh1.pointers.values()].map(r=> [r.pointerType+":"+r.clientX.toFixed(2)+","+r.clientY.toFixed(2)]),
                 }
                 output.textContent = JSON.stringify(json,null,2)
-                console.log(peh1.pointers);
+                console.log('peh1.pointers.size',peh1.pointers.size);
             }
         })
     </script>
