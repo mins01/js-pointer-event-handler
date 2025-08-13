@@ -1,8 +1,10 @@
-class PointerEventHandler{
+export default class PointerEventHandler{
     pointers = null
     maxActivePointers = 0;
     target = null; 
     downAt = null //down 이벤트 발생시간
+
+    inputMode = 'all'; //all, pen, mouse, touch
 
     constructor(target){
         // this.editor = editor

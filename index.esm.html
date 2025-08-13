@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ko" >
 <head>
-    <title>js-pointer-event-handler</title>
+    <title>js-pointer-event-handler esm(module)</title>
     <meta charset="utf-8">
     <meta http-equiv="Content-Script-Type" content="text/javascript">
     <meta http-equiv="Content-Style-Type" content="text/css">
@@ -27,17 +27,21 @@
     
     <!-- meta og -->
     
-    <meta property="og:title" content="js-pointer-event-handler">
-    <meta property="og:description" content="js-pointer-event-handler">
+    <meta property="og:title" content="js-pointer-event-handler esm(module)">
+    <meta property="og:description" content="js-pointer-event-handler esm(module)">
     <meta name="og:image" content="http://www.mins01.com/img/logo.gif">
     <meta property="og:image:width" content="190">
     <meta property="og:image:height" content="70" />
-    <meta property="og:site_name" content="js-pointer-event-handler" />
+    <meta property="og:site_name" content="js-pointer-event-handler esm(module)" />
     <meta property="og:type" content="website">
     
     <!-- //meta og -->
     
-    <script src="PointerEventHandler.js"></script>
+    <!-- <script src="PointerEventHandler.js"></script> -->
+    <script type="module">
+        import PointerEventHandler from './PointerEventHandler.esm.js';
+        globalThis.PointerEventHandler = PointerEventHandler;
+    </script>
     <script>
         window.addEventListener('load',(event)=>{
             const peh1 = globalThis.peh1 = new PointerEventHandler(document.getElementById('box-1'));
@@ -93,15 +97,16 @@
 </head>
 <body>
     <div class="container">
-        <h1>js-pointer-event-handler</h1>
+        <h1>js-pointer-event-handler esm(module)</h1>
+
         <ul class="list-group ">
             <li class="list-group-item">PointerEvent 제어용</li>
             <li class="list-group-item">.ponters, .maxActivePointers 을 제공</li>
             <li class="list-group-item">
-                <a href="index.esm.html">index.esm.html (esm 버전)</a>
+                <a href="index.html">index.html (plain js 버전)</a>
             </li>
         </ul>
-        
+
         <output id="output" style="width: 100%; height: 100vh; height:100dvh; white-space:pre-line;white-space: break-spaces;" class="user-select-none fixed-top pe-none d-flex justify-content-center align-items-center p-3 text-start"></output>
         <div>
             <div class="p-5">
