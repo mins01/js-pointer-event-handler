@@ -1,6 +1,6 @@
 class PointerEventHandler{
     pointers = null
-    maxPointers = 0;
+    maxActivePointers = 0;
     target = null; 
     downAt = null //down 이벤트 발생시간
 
@@ -9,7 +9,7 @@ class PointerEventHandler{
     constructor(target){
         // this.editor = editor
         this.pointers = new Map(); // 멀티터치 제어용
-        this.maxPointers = 0;
+        this.maxActivePointers = 0;
         this.downAt = null;
         if(target){
             this.addEventListener(target);
@@ -58,11 +58,11 @@ class PointerEventHandler{
         }
     }
     pointerdown = (event)=>{
-        if(this.pointers.size===0){ this.downAt = Date.now(); this.maxPointers=0; }
+        if(this.pointers.size===0){ this.downAt = Date.now(); this.maxActivePointers=0; }
         if(!this.pointers.has(event.pointerId)){
             this.target.setPointerCapture(event.pointerId);
             this.pointers.set(event.pointerId, this.extractPointerData(event));
-            this.maxPointers = Math.max(this.maxPointers,this.pointers.size)       
+            this.maxActivePointers = Math.max(this.maxActivePointers,this.pointers.size)       
         }
         
         if(this.onpointerdown){this.onpointerdown(event)}
@@ -77,7 +77,7 @@ class PointerEventHandler{
         if(this.downAt){
             this.pointers.delete(event.pointerId);
             if(this.onpointerup){this.onpointerup(event)}
-            if(this.pointers.size===0){this.downAt = null; this.maxPointers=0;}
+            if(this.pointers.size===0){this.downAt = null; this.maxActivePointers=0;}
         }
         this.target.releasePointerCapture(event.pointerId);
     }
@@ -85,7 +85,7 @@ class PointerEventHandler{
         if(this.downAt){
             this.pointers.delete(event.pointerId);
             if(this.onpointerleave){this.onpointerleave(event)}
-            if(this.pointers.size===0){this.downAt = null; this.maxPointers=0;}
+            if(this.pointers.size===0){this.downAt = null; this.maxActivePointers=0;}
         }
         this.target.releasePointerCapture(event.pointerId);
     }
@@ -93,7 +93,7 @@ class PointerEventHandler{
         if(this.downAt){
             this.pointers.delete(event.pointerId);
             if(this.onpointercancel){this.onpointercancel(event)}
-            if(this.pointers.size===0){this.downAt = null; this.maxPointers=0;}
+            if(this.pointers.size===0){this.downAt = null; this.maxActivePointers=0;}
         }
         this.target.releasePointerCapture(event.pointerId);
     }
