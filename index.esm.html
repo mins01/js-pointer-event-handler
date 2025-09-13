@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ko" >
 <head>
-    <title>js-pointer-event-handler esm(module)</title>
+    <title>js-pointer-event-handler</title>
     <meta charset="utf-8">
     <meta http-equiv="Content-Script-Type" content="text/javascript">
     <meta http-equiv="Content-Style-Type" content="text/css">
@@ -27,12 +27,12 @@
     
     <!-- meta og -->
     
-    <meta property="og:title" content="js-pointer-event-handler esm(module)">
-    <meta property="og:description" content="js-pointer-event-handler esm(module)">
+    <meta property="og:title" content="js-pointer-event-handler">
+    <meta property="og:description" content="js-pointer-event-handler">
     <meta name="og:image" content="http://www.mins01.com/img/logo.gif">
     <meta property="og:image:width" content="190">
     <meta property="og:image:height" content="70" />
-    <meta property="og:site_name" content="js-pointer-event-handler esm(module)" />
+    <meta property="og:site_name" content="js-pointer-event-handler" />
     <meta property="og:type" content="website">
     
     <!-- //meta og -->
@@ -44,8 +44,10 @@
     </script>
     <script>
         window.addEventListener('load',(event)=>{
-            const peh1 = globalThis.peh1 = new PointerEventHandler(document.getElementById('box-1'));
+            const target = document.getElementById('box-1');
+            const peh1 = globalThis.peh1 = new PointerEventHandler(target);
             const output = document.getElementById('output')
+            /*
             peh1.onpointerdown=(event)=>{
                 event.stopPropagation();
                 event.preventDefault();
@@ -91,26 +93,92 @@
                 output.textContent = JSON.stringify(json,null,2)
                 console.log('peh1.pointers.size',peh1.pointers.size);
             }
+            */
+            target.addEventListener('pointerdown.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('pointermove.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('pointerup.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('pointercancel.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('pointerleave.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+
+
+            target.addEventListener('multipointerdown.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('multipointermove.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('multipointerup.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('multipointercancel.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('multipointerleave.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+
+            
+            target.addEventListener('twopointerdown.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData,detail.multiPointerData);                
+            })
+            target.addEventListener('twopointermove.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData,detail.multiPointerData);                
+            })
+            target.addEventListener('twopointerup.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData,detail.multiPointerData);                
+            })
+            target.addEventListener('twopointercancel.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData,detail.multiPointerData);                
+            })
+            target.addEventListener('twopointerleave.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData,detail.multiPointerData);                
+            })
+
+            
         })
     </script>
     
 </head>
 <body>
     <div class="container">
-        <h1>js-pointer-event-handler esm(module)</h1>
-
+        <h1>js-pointer-event-handler</h1>
         <ul class="list-group ">
             <li class="list-group-item">PointerEvent 제어용</li>
             <li class="list-group-item">.ponters, .maxActivePointers 을 제공</li>
             <li class="list-group-item">
-                <a href="index.html">index.html (plain js 버전)</a>
+                <a href="index.esm.html">index.esm.html (esm 버전)</a>
             </li>
         </ul>
-
+        
         <output id="output" style="width: 100%; height: 100vh; height:100dvh; white-space:pre-line;white-space: break-spaces;" class="user-select-none fixed-top pe-none d-flex justify-content-center align-items-center p-3 text-start"></output>
         <div>
             <div class="p-5">
-                <div id="box-1" class="border border-1 rounded text-bg-primary d-flex justify-content-center align-items-center p-1 text-center" style="width:100px;height:100px;touch-action: none;">pointer<br>start</div>
+                <div id="box-1" class="border border-1 rounded text-bg-primary d-flex justify-content-center align-items-center p-1 text-center user-select-none" style="width:100px;height:100px;touch-action: none;">pointer<br>start</div>
             </div>
         </div>
     </div>
