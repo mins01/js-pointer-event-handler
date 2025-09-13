@@ -50,12 +50,8 @@ export default class PointerEventHandler{
         }
 
         this.onpointerdown?.(event)
-        // 커스텀 이벤트 발생
-        const detail = this.getCustomPointerEventDetail({pointerData})
-        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+        this._dispatchPointerEvent(event) // 커스텀 이벤트 발생
         // 멀티 포인터 동작
-        console.log(this.pointers.size);
-        
         if(this.pointers.size>1){ this.multipointerdown(event); }
     }
     pointermove = (event)=>{
@@ -63,9 +59,7 @@ export default class PointerEventHandler{
         const pointerData = this.extractPointerData(event)
         this.pointers.set(event.pointerId, pointerData);
         this.onpointermove?.(event);
-        // 커스텀 이벤트 발생
-        const detail = this.getCustomPointerEventDetail({pointerData})
-        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+        this._dispatchPointerEvent(event) // 커스텀 이벤트 발생
         if(this.pointers.size>1){ this.multipointermove(event); } // 멀티 포인터 동작
     }
     _pointerend = (event)=>{
@@ -73,23 +67,17 @@ export default class PointerEventHandler{
         if(this.pointers.has(event.pointerId)){
             if (event.type === 'pointerup'){
                 this.onpointerup?.(event);
-                // 커스텀 이벤트 발생
-                const detail = this.getCustomPointerEventDetail({pointerData})
-                this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+                this._dispatchPointerEvent(event) // 커스텀 이벤트 발생
                 if(this.pointers.size>1){ this.multipointerup(event); } // 멀티 포인터 동작
             }
             else if (event.type === 'pointerleave'){
                 this.onpointerleave?.(event);
-                // 커스텀 이벤트 발생
-                const detail = this.getCustomPointerEventDetail({pointerData})
-                this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+                this._dispatchPointerEvent(event) // 커스텀 이벤트 발생
                 if(this.pointers.size>1){ this.multipointerleave(event); } // 멀티 포인터 동작
             }
             else if (event.type === 'pointercancel'){
                 this.onpointercancel?.(event);
-                // 커스텀 이벤트 발생
-                const detail = this.getCustomPointerEventDetail({pointerData})
-                this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+                this._dispatchPointerEvent(event) // 커스텀 이벤트 발생
                 if(this.pointers.size>1){ this.multipointercancel(event); } // 멀티 포인터 동작
             }
             this.pointers.delete(event.pointerId)
@@ -98,19 +86,32 @@ export default class PointerEventHandler{
         if(this.pointers.size===0){this.downAt = null; this.maxActivePointers=0;}
     }
 
+    _pointerEvent(event){
+        this._dispatchPointerEvent(event);
+    }
+    _dispatchPointerEvent(event){
+        const pointerData = this.pointers.get(event.pointerId)??this.extractPointerData(event);
+        const detail = this.getCustomPointerEventDetail({pointerData})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+    }
 
+    // 프로퍼티 이벤트 콜백
     onpointerdown(event){
         console.debug('onpointerdown');
     };
+    // 프로퍼티 이벤트 콜백
     onpointermove(event){
         console.debug('onpointermove');
     };
+    // 프로퍼티 이벤트 콜백
     onpointerup(event){
         console.debug('onpointerup');
     };
+    // 프로퍼티 이벤트 콜백
     onpointerleave(event){
         console.debug('onpointerleave');
     };
+    // 프로퍼티 이벤트 콜백
     onpointercancel(event){
         console.debug('onpointercancel');
     };
@@ -119,23 +120,28 @@ export default class PointerEventHandler{
     // TODO;
     // 멀티 포인터 처리부
     multipointerdown(event){
-        return this._multipointerEvent(event);
+        return this._multiPointerEvent(event);
     };
     multipointermove(event){
-        return this._multipointerEvent(event);
+        return this._multiPointerEvent(event);
     };
     multipointerup(event){
-        return this._multipointerEvent(event);
+        return this._multiPointerEvent(event);
     };
     multipointerleave(event){
-        return this._multipointerEvent(event);
+        return this._multiPointerEvent(event);
     };
     multipointercancel(event){
-        return this._multipointerEvent(event);
+        return this._multiPointerEvent(event);
     };
-    _multipointerEvent(event){
+
+
+    
+    _multiPointerEvent(event){
+        this._dispatchMultiPointerEvent(event);
+    }
+    _dispatchMultiPointerEvent(event){
         const pointerData = this.pointers.get(event.pointerId)??this.extractPointerData(event);
-        
         //-- 멀티포인터 데이터 계산
         const pointersValues = Array.from(this.pointers.values());
         const multiPointerData = {
