@@ -143,7 +143,7 @@ class PointerEventHandler{
         const prevPointer = this.prevPointer;
         const metrics = this.getPointerMetrics(prevPointer, pointer );
         const totalMetrics = this.getPointerMetrics(firstPointer, pointer );
-        const detail = this.getCustomPointerEventDetail({metrics,totalMetrics})
+        const detail = this.getCustomPointerEventDetail({event,pointer,metrics,totalMetrics})
         this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
 
         // 멀티 포인터 동작
