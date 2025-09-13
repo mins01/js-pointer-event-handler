@@ -1,7 +1,7 @@
 class PointerEventHandler{
     pointers = null
     maxActivePointers = 0;
-    target = null; 
+    target = null;
     downAt = null //down 이벤트 발생시간
 
     constructor(target){
@@ -46,15 +46,17 @@ class PointerEventHandler{
         if(!this.pointers.has(event.pointerId)){
             this.target.setPointerCapture(event.pointerId);
             this.pointers.set(event.pointerId, pointerData);
-            this.maxActivePointers = Math.max(this.maxActivePointers,this.pointers.size)       
+            this.maxActivePointers = Math.max(this.maxActivePointers,this.pointers.size)
         }
-        
+
         this.onpointerdown?.(event)
         // 커스텀 이벤트 발생
-        const detail = this.getCustomPointerEventDetail({pointerData})      
-        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail })); 
-        // 멀티 포인터 동작        
-        // if(this.pointers.size>1){ this.multipointerdown(event); }
+        const detail = this.getCustomPointerEventDetail({pointerData})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+        // 멀티 포인터 동작
+        console.log(this.pointers.size);
+        
+        if(this.pointers.size>1){ this.multipointerdown(event); }
     }
     pointermove = (event)=>{
         if (!this.downAt || !this.pointers.has(event.pointerId)) return;
@@ -62,9 +64,9 @@ class PointerEventHandler{
         this.pointers.set(event.pointerId, pointerData);
         this.onpointermove?.(event);
         // 커스텀 이벤트 발생
-        const detail = this.getCustomPointerEventDetail({pointerData})      
-        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail })); 
-        // if(this.pointers.size>1){ this.multipointermove(event); } // 멀티 포인터 동작
+        const detail = this.getCustomPointerEventDetail({pointerData})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+        if(this.pointers.size>1){ this.multipointermove(event); } // 멀티 포인터 동작
     }
     _pointerend = (event)=>{
         const pointerData = this.extractPointerData(event)
@@ -72,70 +74,80 @@ class PointerEventHandler{
             if (event.type === 'pointerup'){
                 this.onpointerup?.(event);
                 // 커스텀 이벤트 발생
-                const detail = this.getCustomPointerEventDetail({pointerData})      
-                this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail })); 
-                // if(this.pointers.size>1){ this.multipointerup(event); } // 멀티 포인터 동작
-            } 
+                const detail = this.getCustomPointerEventDetail({pointerData})
+                this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+                if(this.pointers.size>1){ this.multipointerup(event); } // 멀티 포인터 동작
+            }
             else if (event.type === 'pointerleave'){
                 this.onpointerleave?.(event);
                 // 커스텀 이벤트 발생
-                const detail = this.getCustomPointerEventDetail({pointerData})      
-                this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail })); 
-                // if(this.pointers.size>1){ this.multipointerleave(event); } // 멀티 포인터 동작
-            } 
+                const detail = this.getCustomPointerEventDetail({pointerData})
+                this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+                if(this.pointers.size>1){ this.multipointerleave(event); } // 멀티 포인터 동작
+            }
             else if (event.type === 'pointercancel'){
                 this.onpointercancel?.(event);
                 // 커스텀 이벤트 발생
-                const detail = this.getCustomPointerEventDetail({pointerData})      
-                this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail })); 
-                // if(this.pointers.size>1){ this.multipointercancel(event); } // 멀티 포인터 동작
-            } 
+                const detail = this.getCustomPointerEventDetail({pointerData})
+                this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+                if(this.pointers.size>1){ this.multipointercancel(event); } // 멀티 포인터 동작
+            }
             this.pointers.delete(event.pointerId)
         }
         this.target.releasePointerCapture(event.pointerId);
         if(this.pointers.size===0){this.downAt = null; this.maxActivePointers=0;}
     }
-    
+
 
     onpointerdown(event){
-        console.log('onpointerdown');
+        console.debug('onpointerdown');
     };
     onpointermove(event){
-        console.log('onpointermove');
+        console.debug('onpointermove');
     };
     onpointerup(event){
-        console.log('onpointerup');
+        console.debug('onpointerup');
     };
     onpointerleave(event){
-        console.log('onpointerleave');
+        console.debug('onpointerleave');
     };
     onpointercancel(event){
-        console.log('onpointercancel');
+        console.debug('onpointercancel');
     };
 
 
     // TODO;
     // 멀티 포인터 처리부
     multipointerdown(event){
-        console.log('multipointerdown');
+        return this._multipointerEvent(event);
     };
     multipointermove(event){
-        console.log('multipointermove');
+        return this._multipointerEvent(event);
     };
     multipointerup(event){
-        console.log('multipointerup');
-        this._multipointerend(event);
+        return this._multipointerEvent(event);
     };
     multipointerleave(event){
-        console.log('multipointerleave');
-        this._multipointerend(event);
+        return this._multipointerEvent(event);
     };
     multipointercancel(event){
-        console.log('multipointercancel');
-        this._multipointerend(event);
+        return this._multipointerEvent(event);
     };
-    _multipointerend(event){
-        console.log('multipointerend',this.pointers.size);
+    _multipointerEvent(event){
+        const pointerData = this.pointers.get(event.pointerId)??this.extractPointerData(event);
+        
+        //-- 멀티포인터 데이터 계산
+        const pointersValues = Array.from(this.pointers.values());
+        const multiPointerData = {
+            centerX:pointersValues.reduce((sum, p) => sum + p.clientX, 0) / pointersValues.length,
+            centerY:pointersValues.reduce((sum, p) => sum + p.clientY, 0) / pointersValues.length,
+        }
+        
+        const detail = this.getCustomPointerEventDetail({pointerData,multiPointerData})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`multi${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+        if(this.pointers.size==2 && this.maxActivePointers==2){
+            this.target.dispatchEvent(this.getCustomPointerEvent(`two${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));    
+        }
     }
 }
 
