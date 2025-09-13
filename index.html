@@ -40,7 +40,8 @@
     <script src="PointerEventHandler.js"></script>
     <script>
         window.addEventListener('load',(event)=>{
-            const peh1 = globalThis.peh1 = new PointerEventHandler(document.getElementById('box-1'));
+            const target = document.getElementById('box-1');
+            const peh1 = globalThis.peh1 = new PointerEventHandler(target);
             const output = document.getElementById('output')
             peh1.onpointerdown=(event)=>{
                 event.stopPropagation();
@@ -87,6 +88,26 @@
                 output.textContent = JSON.stringify(json,null,2)
                 console.log('peh1.pointers.size',peh1.pointers.size);
             }
+            target.addEventListener('pointerdown.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('pointermove.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('pointerup.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('pointercancel.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
+            target.addEventListener('pointerleave.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerData);                
+            })
         })
     </script>
     
@@ -108,6 +129,17 @@
                 <div id="box-1" class="border border-1 rounded text-bg-primary d-flex justify-content-center align-items-center p-1 text-center" style="width:100px;height:100px;touch-action: none;">pointer<br>start</div>
             </div>
         </div>
+    </div>
+    <div>
+        <button id="nn" class="btn btn-info" >xx</button>
+        <script>
+            {
+                const node = document.querySelector('#nn')
+                node.addEventListener('click', () => console.log('A')); // 1
+                node.onclick = () => console.log('B');                 // 2
+                // node.click(); // 클릭 시
+            }
+        </script>
     </div>
 </body>
 </html>
