@@ -151,15 +151,15 @@ export default class PointerEventHandler{
     }
 
     // 프로퍼티 이벤트 콜백
-    onpointerdown(event){ console.debug('onpointerdown'); };
+    onpointerdown(event){  };
     // 프로퍼티 이벤트 콜백
-    onpointermove(event){ console.debug('onpointermove'); };
+    onpointermove(event){  };
     // 프로퍼티 이벤트 콜백
-    onpointerup(event){ console.debug('onpointerup'); };
+    onpointerup(event){  };
     // 프로퍼티 이벤트 콜백
-    onpointerleave(event){ console.debug('onpointerleave'); };
+    onpointerleave(event){  };
     // 프로퍼티 이벤트 콜백
-    onpointercancel(event){ console.debug('onpointercancel'); };
+    onpointercancel(event){  };
 
 
 
