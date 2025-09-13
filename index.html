@@ -96,72 +96,55 @@
             */
             target.addEventListener('pointerdown.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerMetrics,detail.pointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.metrics,detail.totalMetrics);
             })
             target.addEventListener('pointermove.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerMetrics,detail.pointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.metrics,detail.totalMetrics);
             })
             target.addEventListener('pointerup.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerMetrics,detail.pointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.metrics,detail.totalMetrics);
             })
             target.addEventListener('pointercancel.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerMetrics,detail.pointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.metrics,detail.totalMetrics);
             })
             target.addEventListener('pointerleave.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.pointerMetrics,detail.pointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.metrics,detail.totalMetrics);
             })
 
 
             target.addEventListener('multipointerdown.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics,detail.multiPointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.metrics,detail.totalMetrics);
             })
             target.addEventListener('multipointermove.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics,detail.multiPointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.metrics,detail.totalMetrics);
             })
             target.addEventListener('multipointerup.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics,detail.multiPointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.metrics,detail.totalMetrics);
             })
             target.addEventListener('multipointercancel.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics,detail.multiPointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.metrics,detail.totalMetrics);
             })
             target.addEventListener('multipointerleave.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics,detail.multiPointerTotalMetrics);
+                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.metrics,detail.totalMetrics);
             })
 
-
-            target.addEventListener('twopointerdown.peh',(event)=>{
-                const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics);
-            })
-            target.addEventListener('twopointermove.peh',(event)=>{
-                const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics);
-            })
-            target.addEventListener('twopointerup.peh',(event)=>{
-                const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics);
-            })
-            target.addEventListener('twopointercancel.peh',(event)=>{
-                const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics);
-            })
-            target.addEventListener('twopointerleave.peh',(event)=>{
-                const detail = event.detail;
-                console.log(event.type,detail.pointerEventHandler,[...detail.pointerEventHandler.pointers.values()],detail.multiPointer,detail.multiPointerMetrics);
-            })
 
             target.addEventListener('pinch.peh',(event)=>{
                 const detail = event.detail;
-                console.log(event.type,detail.pinchData);
+                console.log(event.type,detail.multiPointer,detail.metrics,detail.totalMetrics);
+            })
+            target.addEventListener('rotate.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.multiPointer,detail.metrics,detail.totalMetrics);
             })
 
 

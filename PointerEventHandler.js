@@ -45,8 +45,8 @@ class PointerEventHandler{
     prevPointer = null
     pointerdown = (event)=>{
         const pointer = this.extractPointer(event)
-        if(this.pointers.size===0){ 
-            this.downAt = Date.now(); 
+        if(this.pointers.size===0){
+            this.downAt = Date.now();
             this.maxActivePointers=0;
             this.firstPointer = pointer;
             this.prevPointer = pointer;
@@ -75,12 +75,12 @@ class PointerEventHandler{
         if(this.pointers.has(event.pointerId)){
             this?.[`on${event.type}`]?.(event);
             this._pointerEvent(event,pointer) // 포인터 이벤트 처리
-            
+
             this.pointers.delete(event.pointerId)
         }
         this.target.releasePointerCapture(event.pointerId);
         if(this.pointers.size===0){
-            this.downAt = null; 
+            this.downAt = null;
             this.maxActivePointers=0;
             this.firstPointer = null;
             this.prevPointer = null;
@@ -141,9 +141,9 @@ class PointerEventHandler{
     _pointerEvent(event,pointer){
         const firstPointer = this.firstPointer;
         const prevPointer = this.prevPointer;
-        const pointerMetrics = this.getPointerMetrics(prevPointer, pointer );
-        const pointerTotalMetrics = this.getPointerMetrics(firstPointer, pointer );
-        const detail = this.getCustomPointerEventDetail({pointerMetrics,pointerTotalMetrics})
+        const metrics = this.getPointerMetrics(prevPointer, pointer );
+        const totalMetrics = this.getPointerMetrics(firstPointer, pointer );
+        const detail = this.getCustomPointerEventDetail({metrics,totalMetrics})
         this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
 
         // 멀티 포인터 동작
@@ -238,7 +238,7 @@ class PointerEventHandler{
 
     prevMultiPointer = null;
     firstMultiPointer = null;
-    
+
     _multiPointerEvent(event){
         // const pointer = this.pointers.get(event.pointerId)??this.extractPointer(event);
         //-- 멀티포인터 데이터 계산
@@ -253,13 +253,14 @@ class PointerEventHandler{
                 this.firstMultiPointer = multiPointer;
             }
         }
-        const multiPointerMetrics = this.getMultiPointerMetrics(this.prevMultiPointer,multiPointer);
-        const multiPointerTotalMetrics = this.getMultiPointerMetrics(this.firstMultiPointer,multiPointer,);
-        const detail = this.getCustomPointerEventDetail({multiPointer,multiPointerMetrics,multiPointerTotalMetrics})
+        const metrics = this.getMultiPointerMetrics(this.prevMultiPointer,multiPointer);
+        const totalMetrics = this.getMultiPointerMetrics(this.firstMultiPointer,multiPointer,);
+        const detail = this.getCustomPointerEventDetail({multiPointer,metrics,totalMetrics})
         this.target.dispatchEvent(this.getCustomPointerEvent(`multi${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
-        
+
         if(this.pointers.size==2 && this.maxActivePointers==2){
-            this._pinchPointerEvent(event,multiPointer);
+            this._pinchEvent(event,multiPointer);
+            this._rotateEvent(event,multiPointer);
         }
 
         this.prevMultiPointer = multiPointer;
@@ -269,18 +270,33 @@ class PointerEventHandler{
 
     getPinchMetrics(multiPointer1, multiPointer2) {
         const scale = multiPointer2.distance  / multiPointer1.distance
-        // const time = (multiPointer2.timeStamp - multiPointer1.timeStamp) / 1000 ;
-        // const velocity = time?((multiPointer2.distance  - multiPointer1.distance) / time):0;
-        return { 
-            scale , 
-            // velocity ,
+        return {
+            scale ,
         };
     }
-    _pinchPointerEvent(event,multiPointer){
-        const pinchData = this.getPinchMetrics(this.firstMultiPointer,multiPointer)
-        const detail = this.getCustomPointerEventDetail({pinchData})
-        this.target.dispatchEvent(this.getCustomPointerEvent(`pinch.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));    
+    _pinchEvent(event,multiPointer){
+        const metrics = this.getPinchMetrics(this.prevMultiPointer,multiPointer)
+        const totalMetrics = this.getPinchMetrics(this.firstMultiPointer,multiPointer)
+        const detail = this.getCustomPointerEventDetail({multiPointer,metrics,totalMetrics})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`pinch.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
     }
+
+
+    getRotateMetrics(multiPointer1, multiPointer2) {
+        const angleDelta = multiPointer2.angle - multiPointer1.angle
+        return {
+            angleDelta ,  //rad
+        };
+    }
+
+    _rotateEvent(evnet,multiPointer){
+        const metrics = this.getRotateMetrics(this.prevMultiPointer,multiPointer)
+        const totalMetrics = this.getRotateMetrics(this.firstMultiPointer,multiPointer)
+        const detail = this.getCustomPointerEventDetail({multiPointer,metrics,totalMetrics})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`rotate.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+    }
+
+
 
 
 }
