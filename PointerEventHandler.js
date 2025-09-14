@@ -111,7 +111,7 @@ class PointerEventHandler{
         // ----------------------
         // 이동 방향 (각도, 0~360도)
         // ----------------------
-        const angle = Math.atan2(distanceY, distanceX) * 180 / Math.PI;
+        const angle = Math.atan2(distanceY, distanceX) * 180 / Math.PI; // degree
 
         // ----------------------
         // 속도 벡터
@@ -143,8 +143,8 @@ class PointerEventHandler{
         const prevPointer = this.prevPointer;
         const metrics = this.getPointerMetrics(prevPointer, pointer );
         const totalMetrics = this.getPointerMetrics(firstPointer, pointer );
-        const detail = this.getCustomPointerEventDetail({originalEvent:event,pointer,metrics,totalMetrics})
-        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+        const detail = this.getCustomPointerEventDetail({originalEvent:event,pointer,prevPointer,prevPointer,metrics,totalMetrics})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
 
         // 멀티 포인터 동작
         if(this.pointers.size>1){ this._multiPointerEvent(event) }
@@ -172,9 +172,11 @@ class PointerEventHandler{
         const distance = Math.hypot(distanceX, distanceY);
         const centerX = (pointer1.clientX + pointer2.clientX) / 2;
         const centerY = (pointer1.clientY + pointer2.clientY) / 2;
-        const angle = Math.atan2(distanceY, distanceX); // rad
+        const angle = Math.atan2(distanceY, distanceX) * 180 / Math.PI; //degree
         const timeStamp = pointer2.timeStamp;
         return {
+            pointer1,
+            pointer2,
             centerX,
             centerY,
             distanceX,
@@ -208,7 +210,7 @@ class PointerEventHandler{
         // ----------------------
         // 이동 방향 (각도, 0~360도)
         // ----------------------
-        const angle = Math.atan2(distanceY, distanceX) * 180 / Math.PI;
+        const angle = Math.atan2(distanceY, distanceX) * 180 / Math.PI; //degree
 
         // ----------------------
         // 속도 벡터
@@ -238,7 +240,6 @@ class PointerEventHandler{
 
     prevMultiPointer = null;
     firstMultiPointer = null;
-
     _multiPointerEvent(event){
         // const pointer = this.pointers.get(event.pointerId)??this.extractPointer(event);
         //-- 멀티포인터 데이터 계산
@@ -253,14 +254,15 @@ class PointerEventHandler{
                 this.firstMultiPointer = multiPointer;
             }
         }
-        const metrics = this.getMultiPointerMetrics(this.prevMultiPointer,multiPointer);
-        const totalMetrics = this.getMultiPointerMetrics(this.firstMultiPointer,multiPointer,);
-        const detail = this.getCustomPointerEventDetail({multiPointer,metrics,totalMetrics})
-        this.target.dispatchEvent(this.getCustomPointerEvent(`multi${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+        const prevMultiPointer = this.prevMultiPointer
+        const firstMultiPointer = this.firstMultiPointer
+        const metrics = this.getMultiPointerMetrics(prevMultiPointer,multiPointer);
+        const totalMetrics = this.getMultiPointerMetrics(firstMultiPointer,multiPointer,);
+        const detail = this.getCustomPointerEventDetail({originalEvent:event,pointer1,pointer2,multiPointer,prevMultiPointer,firstMultiPointer,metrics,totalMetrics})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`multi${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
 
         if(this.pointers.size==2 && this.maxActivePointers==2){
-            this._pinchEvent(event,multiPointer);
-            this._rotateEvent(event,multiPointer);
+            this._gestureEvent(event,multiPointer);
         }
 
         this.prevMultiPointer = multiPointer;
@@ -268,36 +270,45 @@ class PointerEventHandler{
 
 
 
-    getPinchMetrics(multiPointer1, multiPointer2) {
+    // 제스쳐 이벤트. pinch와 rotate도 연관되어 발생
+    getGestureMetrics(multiPointer1, multiPointer2) {
         const scale = multiPointer2.distance  / multiPointer1.distance
+        const rotation = multiPointer2.angle - multiPointer1.angle
         return {
+            multiPointer1, 
+            multiPointer2,
             scale ,
+            rotation ,
         };
     }
-    _pinchEvent(event,multiPointer){
-        const metrics = this.getPinchMetrics(this.prevMultiPointer,multiPointer)
-        const totalMetrics = this.getPinchMetrics(this.firstMultiPointer,multiPointer)
-        const detail = this.getCustomPointerEventDetail({multiPointer,metrics,totalMetrics})
-        this.target.dispatchEvent(this.getCustomPointerEvent(`pinch.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
+    _gestureEvent(event,multiPointer){
+        const prevMultiPointer = this.prevMultiPointer
+        const firstMultiPointer = this.firstMultiPointer
+        const metrics = this.getGestureMetrics(prevMultiPointer,multiPointer)
+        const totalMetrics = this.getGestureMetrics(firstMultiPointer,multiPointer)
+        const detail = this.getCustomPointerEventDetail({originalEvent:event,multiPointer,prevMultiPointer,firstMultiPointer,metrics,totalMetrics})
+        // this.target.dispatchEvent(this.getCustomPointerEvent(`pinch.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
+
+        const detalEvent = {
+            "pointerdown":"gesturestart.peh",
+            "pointermove":"gesturechange.peh",
+            "pointerup":"gestureend.peh",
+            "pointerleave":"gestureleave.peh",
+            "pointercancel":"gesturecancel.peh",
+        }?.[event.type];
+        if(detalEvent){
+            this.target.dispatchEvent(this.getCustomPointerEvent(detalEvent,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
+        }
+        if(detalEvent == "gesturechange.peh"){ // 이벤트 변화에 따라서
+            if(metrics.scale !== 1){ // scale이 변경될 경우 pinch 이벤트 발생
+                this.target.dispatchEvent(this.getCustomPointerEvent('pinch.peh',{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
+            }
+            if(metrics.rotation !== 0){ // rotation에 변화가 있으면  rotate 이벤트 발생
+                this.target.dispatchEvent(this.getCustomPointerEvent('rotate.peh',{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
+            }
+        }
+
     }
-
-
-    getRotateMetrics(multiPointer1, multiPointer2) {
-        const angleDelta = multiPointer2.angle - multiPointer1.angle
-        return {
-            angleDelta ,  //rad
-        };
-    }
-
-    _rotateEvent(evnet,multiPointer){
-        const metrics = this.getRotateMetrics(this.prevMultiPointer,multiPointer)
-        const totalMetrics = this.getRotateMetrics(this.firstMultiPointer,multiPointer)
-        const detail = this.getCustomPointerEventDetail({multiPointer,metrics,totalMetrics})
-        this.target.dispatchEvent(this.getCustomPointerEvent(`rotate.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail }));
-    }
-
-
-
 
 }
 

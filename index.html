@@ -138,14 +138,33 @@
             })
 
 
+
+
+            target.addEventListener('gesturestart.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.multiPointer,detail.metrics,detail.totalMetrics);
+            })
+            target.addEventListener('gesturechange.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.multiPointer,detail.metrics,detail.totalMetrics);
+            })
+            target.addEventListener('gestureend.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.multiPointer,detail.metrics,detail.totalMetrics);
+            })
+
             target.addEventListener('pinch.peh',(event)=>{
                 const detail = event.detail;
                 console.log(event.type,detail.multiPointer,detail.metrics,detail.totalMetrics);
             })
+
+
             target.addEventListener('rotate.peh',(event)=>{
                 const detail = event.detail;
                 console.log(event.type,detail.multiPointer,detail.metrics,detail.totalMetrics);
             })
+
+            
 
 
         })
