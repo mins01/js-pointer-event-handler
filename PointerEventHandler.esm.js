@@ -64,13 +64,14 @@ export default class PointerEventHandler{
         return !!( this.firstPointer && this.target.hasPointerCapture(this.firstPointer.pointerId) );
     }
     gotpointercapture = (event)=>{
-        // this.isPointerCaptured = true;
         const detail = this.getCustomPointerEventDetail({originalEvent:event})
         this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
     }
     lostpointercapture = (event)=>{
-        // this.isPointerCaptured = false;
-        this._pointerend(event)
+        // this._pointerend(event)
+        // 이벤트 흐름 안 끝냄. 모바일에서 자주 발생된다.
+        const detail = this.getCustomPointerEventDetail({originalEvent:event})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
     }
 
     firstPointer = null
