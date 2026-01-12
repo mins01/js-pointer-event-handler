@@ -25,6 +25,7 @@ class PointerEventHandler{
         const options = { passive: false };
         target.addEventListener('pointerdown',this.pointerdown);
         target.addEventListener('pointermove',this.pointermove,options)
+        
         target.addEventListener('pointerup',this._pointerend)
         // target.addEventListener('pointerleave',this._pointerend); // 거의 발생하지 않을꺼다. 발생시 문제가 될 수 있어서 체크 안한다.
         target.addEventListener('pointercancel',this._pointerend) // 시스템 메세지 등이 뜨면 발생.
@@ -38,9 +39,11 @@ class PointerEventHandler{
         const options = { passive: false };
         this.target.removeEventListener('pointerdown',this.pointerdown);
         this.target.removeEventListener('pointermove',this.pointermove,options)
+
         this.target.removeEventListener('pointerup',this._pointerend)
         // this.target.removeEventListener('pointerleave',this._pointerend)
         this.target.removeEventListener('pointercancel',this._pointerend)
+        
         this.target.removeEventListener('gotpointercapture',this.gotpointercapture) // 포인터 캡쳐
         this.target.removeEventListener('lostpointercapture',this.lostpointercapture) // 포인터 캡쳐
     }
@@ -62,8 +65,7 @@ class PointerEventHandler{
     }
     lostpointercapture = (event)=>{
         this.isPointerCaptured = false;
-        const detail = this.getCustomPointerEventDetail({originalEvent:event})
-        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
+        this._pointerend(event)
     }
 
     firstPointer = null
