@@ -1,5 +1,5 @@
 export default class PointerEventHandler{
-    static VERSION = '2026.01.12'; // 버전 날짜.
+    static VERSION = '2026.01.12 14'; // 버전 날짜.
 
     pointers = null
     maxActivePointers = 0;
@@ -61,7 +61,7 @@ export default class PointerEventHandler{
     }
 
     get isPointerCaptured(){
-        return this.target.hasPointerCapture(this.firstPointer?.pointerId)
+        return !!( this.firstPointer && this.target.hasPointerCapture(this.firstPointer.pointerId) );
     }
     gotpointercapture = (event)=>{
         // this.isPointerCaptured = true;
@@ -111,8 +111,8 @@ export default class PointerEventHandler{
         }
     }
     _pointerend = (event)=>{
-        const pointer = this.extractPointer(event)
         if(this.pointers.has(event.pointerId)){
+            const pointer = this.extractPointer(event)
             this?.[`on${event.type}`]?.(event);
             this._pointerEvent(event,pointer) // 포인터 이벤트 처리
             this._pointerEvent(event,pointer,'pointerend') // 포인터 end 이벤트 처리
