@@ -77,7 +77,10 @@ class PointerEventHandler{
         this.onpointermove?.(event);
         const detail  = this._pointerEvent(event,pointer) // 포인터 이벤트 처리
 
-        IF(!this.target.hasPointerCapture(event.pointerId) && Math.abs(detail.totalMetrics.distance) >= (this.interactionThreshold[event.pointerType]??8)){ this.target.setPointerCapture(event.pointerId); } // 캡처를 안했고 드래그가 최소 4px 이 있을 경우만 캡쳐한다.
+        // 캡처를 안했고 드래그가 최소 4px 이 있을 경우만 캡쳐한다.
+        if(!this.target.hasPointerCapture(event.pointerId) && Math.abs(detail.totalMetrics.distance) >= (this.interactionThreshold[event.pointerType]??8)){
+            this.target.setPointerCapture(event.pointerId); 
+        }
 
         if(event.isPrimary){
             this.prevPointer = pointer;
