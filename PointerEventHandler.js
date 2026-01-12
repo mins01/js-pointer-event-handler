@@ -3,9 +3,16 @@ class PointerEventHandler{
     maxActivePointers = 0;
     target = null;
     downAt = null //down 이벤트 발생시간
+    static interactionThreshold = {
+        mouse: 4,
+        pen: 5,
+        touch: 8,
+    }; // 요소 클릭 후 드래그 캡처 시작 임계값(px)
+    // interactionThreshold = null; //요소 클릭 후 드래그 캡처 시작 임계값(px)
 
     constructor(target){
-        // this.editor = editor
+        this.interactionThreshold = {...this.constructor.interactionThreshold}
+        
         this.pointers = new Map(); // 멀티터치 제어용
         this.maxActivePointers = 0;
         this.downAt = null;
@@ -19,7 +26,7 @@ class PointerEventHandler{
         target.addEventListener('pointerdown',this.pointerdown);
         target.addEventListener('pointermove',this.pointermove,options)
         target.addEventListener('pointerup',this._pointerend)
-        target.addEventListener('pointerleave',this._pointerend); // 거의 발생하지 않을꺼다
+        // target.addEventListener('pointerleave',this._pointerend); // 거의 발생하지 않을꺼다. 발생시 문제가 될 수 있어서 체크 안한다.
         target.addEventListener('pointercancel',this._pointerend) // 시스템 메세지 등이 뜨면 발생.
     }
     removeEventListener(){
@@ -28,7 +35,7 @@ class PointerEventHandler{
         this.target.removeEventListener('pointerdown',this.pointerdown);
         this.target.removeEventListener('pointermove',this.pointermove,options)
         this.target.removeEventListener('pointerup',this._pointerend)
-        this.target.removeEventListener('pointerleave',this._pointerend)
+        // this.target.removeEventListener('pointerleave',this._pointerend)
         this.target.removeEventListener('pointercancel',this._pointerend)
     }
     getCustomPointerEventDetail(data){
@@ -43,7 +50,10 @@ class PointerEventHandler{
 
     firstPointer = null
     prevPointer = null
+    pointerCaptured = false;
     pointerdown = (event)=>{
+        // console.log(event.target,event.currentTarget);
+        
         const pointer = this.extractPointer(event)
         if(this.pointers.size===0){
             this.downAt = Date.now();
@@ -52,7 +62,7 @@ class PointerEventHandler{
             this.prevPointer = pointer;
         }
         if(!this.pointers.has(event.pointerId)){
-            this.target.setPointerCapture(event.pointerId);
+            if(event.target === this.target){ this.target.setPointerCapture(event.pointerId); } // 이벤트 발생 요소가 이벤트 처리 요소가 같은 경우만 pointerdown 에서 캡처한다.
             this.pointers.set(event.pointerId, pointer);
             this.maxActivePointers = Math.max(this.maxActivePointers,this.pointers.size)
         }
@@ -65,7 +75,10 @@ class PointerEventHandler{
         const pointer = this.extractPointer(event)
         this.pointers.set(event.pointerId, pointer);
         this.onpointermove?.(event);
-        this._pointerEvent(event,pointer) // 포인터 이벤트 처리
+        const detail  = this._pointerEvent(event,pointer) // 포인터 이벤트 처리
+
+        IF(!this.target.hasPointerCapture(event.pointerId) && Math.abs(detail.totalMetrics.distance) >= (this.interactionThreshold[event.pointerType]??8)){ this.target.setPointerCapture(event.pointerId); } // 캡처를 안했고 드래그가 최소 4px 이 있을 경우만 캡쳐한다.
+
         if(event.isPrimary){
             this.prevPointer = pointer;
         }
@@ -75,10 +88,10 @@ class PointerEventHandler{
         if(this.pointers.has(event.pointerId)){
             this?.[`on${event.type}`]?.(event);
             this._pointerEvent(event,pointer) // 포인터 이벤트 처리
-
+            if(this.target.hasPointerCapture(event.pointerId)) this.target.releasePointerCapture(event.pointerId);
             this.pointers.delete(event.pointerId)
         }
-        this.target.releasePointerCapture(event.pointerId);
+        
         if(this.pointers.size===0){
             this.downAt = null;
             this.maxActivePointers=0;
@@ -148,6 +161,8 @@ class PointerEventHandler{
 
         // 멀티 포인터 동작
         if(this.pointers.size>1){ this._multiPointerEvent(event) }
+
+        return detail;
     }
 
     // 프로퍼티 이벤트 콜백
