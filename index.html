@@ -164,6 +164,16 @@
                 console.log(event.type,detail.multiPointer,detail.metrics,detail.totalMetrics);
             })
 
+            target.addEventListener('gotpointercapture.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.originalEvent);
+            })
+
+            target.addEventListener('lostpointercapture.peh',(event)=>{
+                const detail = event.detail;
+                console.log(event.type,detail.originalEvent);
+            })
+
             
 
 

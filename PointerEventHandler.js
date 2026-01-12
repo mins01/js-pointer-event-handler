@@ -28,6 +28,10 @@ class PointerEventHandler{
         target.addEventListener('pointerup',this._pointerend)
         // target.addEventListener('pointerleave',this._pointerend); // 거의 발생하지 않을꺼다. 발생시 문제가 될 수 있어서 체크 안한다.
         target.addEventListener('pointercancel',this._pointerend) // 시스템 메세지 등이 뜨면 발생.
+        target.addEventListener('pointercancel',this._pointerend) // 시스템 메세지 등이 뜨면 발생.
+        
+        target.addEventListener('gotpointercapture',this.gotpointercapture) // 포인터 캡쳐
+        target.addEventListener('lostpointercapture',this.lostpointercapture) // 포인터 캡쳐
     }
     removeEventListener(){
         if(!this.target) {return; }
@@ -37,6 +41,8 @@ class PointerEventHandler{
         this.target.removeEventListener('pointerup',this._pointerend)
         // this.target.removeEventListener('pointerleave',this._pointerend)
         this.target.removeEventListener('pointercancel',this._pointerend)
+        this.target.removeEventListener('gotpointercapture',this.gotpointercapture) // 포인터 캡쳐
+        this.target.removeEventListener('lostpointercapture',this.lostpointercapture) // 포인터 캡쳐
     }
     getCustomPointerEventDetail(data){
         return {pointerEventHandler:this, ...data};
@@ -48,9 +54,20 @@ class PointerEventHandler{
         return { pointerId, pointerType, isPrimary, clientX, clientY, pageX, pageY, screenX, screenY, pressure, tiltX, tiltY, buttons, width, height, twist, timeStamp, tangentialPressure,x,y };
     }
 
+    isPointerCaptured = false;
+    gotpointercapture = (event)=>{
+        this.isPointerCaptured = true;
+        const detail = this.getCustomPointerEventDetail({originalEvent:event})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
+    }
+    lostpointercapture = (event)=>{
+        this.isPointerCaptured = false;
+        const detail = this.getCustomPointerEventDetail({originalEvent:event})
+        this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
+    }
+
     firstPointer = null
     prevPointer = null
-    pointerCaptured = false;
     pointerdown = (event)=>{
         // console.log(event.target,event.currentTarget);
         
@@ -279,11 +296,14 @@ class PointerEventHandler{
         const detail = this.getCustomPointerEventDetail({originalEvent:event,pointer1,pointer2,multiPointer,prevMultiPointer,firstMultiPointer,metrics,totalMetrics})
         this.target.dispatchEvent(this.getCustomPointerEvent(`multi${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
 
-        if(this.pointers.size==2 && this.maxActivePointers==2){
-            this._gestureEvent(event,multiPointer);
-        }
-
         this.prevMultiPointer = multiPointer;
+
+        if(this.pointers.size==2 && this.maxActivePointers==2){
+            return this._gestureEvent(event,multiPointer);
+        }
+        return detail;
+
+        
     }
 
 
@@ -325,6 +345,7 @@ class PointerEventHandler{
                 this.target.dispatchEvent(this.getCustomPointerEvent('rotate.peh',{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
             }
         }
+        return detail;
 
     }
 
