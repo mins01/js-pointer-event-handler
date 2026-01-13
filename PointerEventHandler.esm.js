@@ -309,12 +309,16 @@ export default class PointerEventHandler{
         const detail = this.getCustomPointerEventDetail({originalEvent:event,pointer1,pointer2,multiPointer,prevMultiPointer,firstMultiPointer,metrics,totalMetrics})
         this.target.dispatchEvent(this.getCustomPointerEvent(`multi${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
 
+        
+        let r = detail
+        if(this.pointers.size==2 && this.maxActivePointers==2){
+            const detail = this._gestureEvent(event,multiPointer);
+            r = detail;
+        }
+        
         this.prevMultiPointer = multiPointer;
 
-        if(this.pointers.size==2 && this.maxActivePointers==2){
-            return this._gestureEvent(event,multiPointer);
-        }
-        return detail;
+        return r;
 
         
     }
@@ -351,6 +355,8 @@ export default class PointerEventHandler{
             this.target.dispatchEvent(this.getCustomPointerEvent(detalEvent,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
         }
         if(detalEvent == "gesturechange.peh"){ // 이벤트 변화에 따라서
+            console.log('xxxxxxxxxxxxxxxxx',metrics);
+            
             if(metrics.scale !== 1){ // scale이 변경될 경우 pinch 이벤트 발생
                 this.target.dispatchEvent(this.getCustomPointerEvent('pinch.peh',{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
             }
