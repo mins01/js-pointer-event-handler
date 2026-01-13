@@ -355,8 +355,6 @@ class PointerEventHandler{
             this.target.dispatchEvent(this.getCustomPointerEvent(detalEvent,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
         }
         if(detalEvent == "gesturechange.peh"){ // 이벤트 변화에 따라서
-            console.log('xxxxxxxxxxxxxxxxx',metrics);
-            
             if(metrics.scale !== 1){ // scale이 변경될 경우 pinch 이벤트 발생
                 this.target.dispatchEvent(this.getCustomPointerEvent('pinch.peh',{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
             }
