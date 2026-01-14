@@ -1,0 +1,37 @@
+{
+  "name": "js-pointer-event-handler",
+  "version": "1.0.0",
+  "description": "Lightweight pointer & gesture event handler for browser environments",
+  "license": "MIT",
+  "author": "mins01",
+
+  "exports": {
+    ".": {
+      "import": "./PointerEventHandler.esm.js",
+      "default": "./PointerEventHandler.js"
+    }
+  },
+
+  "browser": "./PointerEventHandler.js",
+  "module": "./PointerEventHandler.esm.js",
+
+  "files": [
+    "PointerEventHandler.js",
+    "PointerEventHandler.esm.js",
+    "README.md",
+    "LICENSE"
+  ],
+
+  "keywords": [
+    "pointer",
+    "pointer-events",
+    "gesture",
+    "touch",
+    "drag",
+    "mouse",
+    "pen",
+    "browser"
+  ],
+
+  "sideEffects": false
+}
