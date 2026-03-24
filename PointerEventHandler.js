@@ -1,5 +1,5 @@
 class PointerEventHandler{
-    static VERSION = '2026.01.12 14'; // 버전 날짜.
+    static VERSION = '2026.03.24 09'; // 버전 날짜.
 
     pointers = null
     maxActivePointers = 0;
@@ -26,28 +26,27 @@ class PointerEventHandler{
     addEventListener(target){
         this.target = target
         // const options = { passive: false };
-        this.target.addEventListener('pointerdown',this.pointerdown);
-        this.target.addEventListener('pointermove',this.pointermove,this.addEventListenerOptions)
+        this.target.addEventListener('pointerdown',this.handlePointerdown);
         
-        this.target.addEventListener('pointerup',this._pointerend)
-        // this.target.addEventListener('pointerleave',this._pointerend); // 거의 발생하지 않을꺼다. 발생시 문제가 될 수 있어서 체크 안한다.
-        this.target.addEventListener('pointercancel',this._pointerend) // 시스템 메세지 등이 뜨면 발생.
         
-        this.target.addEventListener('gotpointercapture',this.gotpointercapture) // 포인터 캡처
-        this.target.addEventListener('lostpointercapture',this.lostpointercapture) // 포인터 캡처
+        this.target.addEventListener('pointerup',this.handlePointerend)
+        // this.target.addEventListener('pointerleave',this.handlePointerend); // 거의 발생하지 않을꺼다. 발생시 문제가 될 수 있어서 체크 안한다.
+        this.target.addEventListener('pointercancel',this.handlePointerend) // 시스템 메세지 등이 뜨면 발생.
+        
+        this.target.addEventListener('gotpointercapture',this.handleGotpointercapture) // 포인터 캡처
+        this.target.addEventListener('lostpointercapture',this.handleLostpointercapture) // 포인터 캡처
     }
     removeEventListener(){
         if(!this.target) {return; }
         // const options = { passive: false };
-        this.target.removeEventListener('pointerdown',this.pointerdown);
-        this.target.removeEventListener('pointermove',this.pointermove,this.addEventListenerOptions)
+        this.target.removeEventListener('pointerdown',this.handlePointerdown);
 
-        this.target.removeEventListener('pointerup',this._pointerend)
-        // this.target.removeEventListener('pointerleave',this._pointerend)
-        this.target.removeEventListener('pointercancel',this._pointerend)
+        this.target.removeEventListener('pointerup',this.handlePointerend)
+        // this.target.removeEventListener('pointerleave',this.handlePointerend)
+        this.target.removeEventListener('pointercancel',this.handlePointerend)
         
-        this.target.removeEventListener('gotpointercapture',this.gotpointercapture) // 포인터 캡처
-        this.target.removeEventListener('lostpointercapture',this.lostpointercapture) // 포인터 캡처
+        this.target.removeEventListener('gotpointercapture',this.handleGotpointercapture) // 포인터 캡처
+        this.target.removeEventListener('lostpointercapture',this.handleLostpointercapture) // 포인터 캡처
     }
     getCustomPointerEventDetail(data){
         return {pointerEventHandler:this, ...data};
@@ -63,12 +62,12 @@ class PointerEventHandler{
     get isPointerCaptured(){
         return !!( this.firstPointer && this.target.hasPointerCapture(this.firstPointer.pointerId) );
     }
-    gotpointercapture = (event)=>{
+    handleGotpointercapture = (event)=>{
         const detail = this.getCustomPointerEventDetail({originalEvent:event})
         this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
     }
-    lostpointercapture = (event)=>{
-        // this._pointerend(event)
+    handleLostpointercapture = (event)=>{
+        // this.handlePointerend(event)
         // 이벤트 흐름 안 끝냄. 모바일에서 자주 발생된다.
         const detail = this.getCustomPointerEventDetail({originalEvent:event})
         this.target.dispatchEvent(this.getCustomPointerEvent(`${event.type}.peh`,{bubbles:event.bubbles,cancelable:event.cancelable,composed:event.composed,detail}));
@@ -76,7 +75,7 @@ class PointerEventHandler{
 
     firstPointer = null
     prevPointer = null
-    pointerdown = (event)=>{
+    handlePointerdown = (event)=>{
         // console.log(event.target,event.currentTarget);
         
         const pointer = this.extractPointer(event)
@@ -92,10 +91,12 @@ class PointerEventHandler{
             this.maxActivePointers = Math.max(this.maxActivePointers,this.pointers.size)
         }
 
+        this.target.addEventListener('pointermove',this.handlePointermove,this.addEventListenerOptions)
+
         this.onpointerdown?.(event)
         this._pointerEvent(event,pointer) // 포인터 이벤트 처리
     }
-    pointermove = (event)=>{
+    handlePointermove = (event)=>{
         if (!this.downAt || !this.pointers.has(event.pointerId)) return;
         const pointer = this.extractPointer(event)
         this.pointers.set(event.pointerId, pointer);
@@ -111,7 +112,7 @@ class PointerEventHandler{
             this.prevPointer = pointer;
         }
     }
-    _pointerend = (event)=>{
+    handlePointerend = (event)=>{
         if(this.pointers.has(event.pointerId)){
             const pointer = this.extractPointer(event)
             this?.[`on${event.type}`]?.(event);
@@ -127,6 +128,7 @@ class PointerEventHandler{
             this.firstPointer = null;
             this.prevPointer = null;
         }
+        this.target.removeEventListener('pointermove',this.handlePointermove,this.addEventListenerOptions)
     }
 
     // primary 포인터에 대한 계산처리
